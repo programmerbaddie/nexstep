@@ -13,7 +13,73 @@ export interface UserProfile {
   skills: string[]
   interests: string[]
   academicLoad: 'light' | 'moderate' | 'heavy'
+  chosenCompanion: string // e.g. 'nova'
+  companionCustomName: string // e.g. 'Nova'
 }
+
+export interface Companion {
+  id: string
+  name: string
+  emoji: string
+  tagline: string
+  personality: string
+  color: string
+  avatarBg: string
+  avatarBorder: string
+  description: string
+  greeting: string
+}
+
+export const COMPANIONS: Companion[] = [
+  {
+    id: 'nova',
+    name: 'Nova',
+    emoji: '🌱',
+    tagline: 'The Calming Sprout',
+    personality: 'Gentle & Grounding',
+    color: '#7EC8A5',
+    avatarBg: 'bg-emerald-50',
+    avatarBorder: 'border-emerald-200',
+    description: 'Specializes in burnout prevention, pacing heavy CS coursework, and mindful breathing breaks.',
+    greeting: "Remember: small daily commits lead to monumental breakthroughs. Let's take it one step at a time.",
+  },
+  {
+    id: 'byte',
+    name: 'Byte',
+    emoji: '⚡',
+    tagline: 'The Curious Bot',
+    personality: 'Energized & Focused',
+    color: '#FBD38D',
+    avatarBg: 'bg-amber-50',
+    avatarBorder: 'border-amber-200',
+    description: 'Thrives on deep work sprint blocks, clean system architecture, and algorithmic mastery.',
+    greeting: "High bandwidth detected! Let's lock in and crack that distributed consensus lab today.",
+  },
+  {
+    id: 'lumi',
+    name: 'Lumi',
+    emoji: '✨',
+    tagline: 'The Guiding Star',
+    personality: 'Strategic & Ambitious',
+    color: '#D3C5F5',
+    avatarBg: 'bg-purple-50',
+    avatarBorder: 'border-purple-200',
+    description: 'Guides your career trajectory: internship applications, hackathons, and technical interview roadmaps.',
+    greeting: "Your career milestones are aligning. Every application and problem solved compounds your value.",
+  },
+  {
+    id: 'zen',
+    name: 'Zen',
+    emoji: '🍃',
+    tagline: 'The Mindful Sage',
+    personality: 'Peaceful & Reflective',
+    color: '#A5D8F3',
+    avatarBg: 'bg-sky-50',
+    avatarBorder: 'border-sky-200',
+    description: 'Protects mental equilibrium during midterms, reduces cognitive fatigue, and encourages guilt-free rest.',
+    greeting: "Breathe in clarity, breathe out pressure. Your worth is never measured by compile errors.",
+  },
+]
 
 export interface ConnectedService {
   id: string
@@ -24,16 +90,19 @@ export interface ConnectedService {
   lastSync?: string
   description: string
   stats?: string
+  requiredInOnboarding?: boolean
 }
 
 export interface DailyCheckinRecord {
   date: string
-  energy: number // 1-5
-  stress: number // 1-5
-  mood: 'energized' | 'calm' | 'neutral' | 'overwhelmed' | 'tired'
-  journalPrompt: string
+  feeling?: 'great' | 'busy' | 'overwhelmed' | 'exhausted' | 'lost'
+  attention?: 'Exams' | 'Assignments' | 'Internship' | 'Hackathon' | 'Personal'
+  energy?: number // 1-5
+  stress?: number // 1-5
+  mood?: 'energized' | 'calm' | 'neutral' | 'overwhelmed' | 'tired'
+  journalPrompt?: string
   notes?: string
-  topGoal: string
+  topGoal?: string
 }
 
 export interface ActionItem {
@@ -85,28 +154,21 @@ export const INITIAL_USER: UserProfile = {
   skills: ['React', 'TypeScript', 'Go', 'Python', 'Docker', 'PostgreSQL', 'Data Structures & Algos'],
   interests: ['System Architecture', 'LLM Agents', 'Mindfulness in Tech', 'Hackathons'],
   academicLoad: 'heavy',
+  chosenCompanion: 'nova',
+  companionCustomName: 'Nova',
 }
 
 export const INITIAL_SERVICES: ConnectedService[] = [
   {
-    id: 'github',
-    name: 'GitHub',
-    category: 'career',
-    icon: 'Github',
+    id: 'gmail',
+    name: 'Gmail',
+    category: 'productivity',
+    icon: 'Mail',
     status: 'connected',
-    lastSync: '12 mins ago',
-    description: 'Track commit consistency, project repos, and open-source contributions.',
-    stats: '14 day commit streak · 18 repos',
-  },
-  {
-    id: 'canvas',
-    name: 'Canvas LMS',
-    category: 'academic',
-    icon: 'GraduationCap',
-    status: 'connected',
-    lastSync: '40 mins ago',
-    description: 'Sync deadlines, assignment grades, announcements, and syllabus dates.',
-    stats: '4 courses synced · 2 upcoming assignments',
+    lastSync: '8 mins ago',
+    description: 'Syncs interview invitations, campus updates, and professor office hours.',
+    stats: 'Inbox synced · 1 interview update',
+    requiredInOnboarding: true,
   },
   {
     id: 'google_calendar',
@@ -117,6 +179,61 @@ export const INITIAL_SERVICES: ConnectedService[] = [
     lastSync: '5 mins ago',
     description: 'Unified view of lectures, study blocks, interview dates, and downtime.',
     stats: '5 events today · 2 study blocks',
+    requiredInOnboarding: true,
+  },
+  {
+    id: 'github',
+    name: 'GitHub',
+    category: 'career',
+    icon: 'Github',
+    status: 'connected',
+    lastSync: '12 mins ago',
+    description: 'Track commit consistency, project repos, and open-source contributions.',
+    stats: '14 day commit streak · 18 repos',
+    requiredInOnboarding: true,
+  },
+  {
+    id: 'linkedin',
+    name: 'LinkedIn',
+    category: 'career',
+    icon: 'Linkedin',
+    status: 'connected',
+    lastSync: '1 hour ago',
+    description: 'Monitors recruiter inbound inquiries, alumni network, and hiring cycles.',
+    stats: 'Profile active · 4 recruiter views',
+    requiredInOnboarding: true,
+  },
+  {
+    id: 'unstop',
+    name: 'Unstop',
+    category: 'career',
+    icon: 'Trophy',
+    status: 'disconnected',
+    description: 'Discover collegiate hackathons, coding challenges, and case competitions.',
+    stats: 'Optional integration',
+    requiredInOnboarding: false,
+  },
+  {
+    id: 'notion',
+    name: 'Notion',
+    category: 'productivity',
+    icon: 'FileText',
+    status: 'connected',
+    lastSync: '2 hours ago',
+    description: 'Pull lecture notes, project roadmaps, and personal journals.',
+    stats: 'Coursework workspace synced',
+    requiredInOnboarding: false,
+  },
+  {
+    id: 'canvas',
+    name: 'Canvas LMS',
+    category: 'academic',
+    icon: 'GraduationCap',
+    status: 'connected',
+    lastSync: '40 mins ago',
+    description: 'Sync deadlines, assignment grades, announcements, and syllabus dates.',
+    stats: '4 courses synced · 2 upcoming assignments',
+    requiredInOnboarding: false,
   },
   {
     id: 'leetcode',
@@ -127,14 +244,7 @@ export const INITIAL_SERVICES: ConnectedService[] = [
     lastSync: '3 hours ago',
     description: 'Monitors problem-solving cadence without toxic grind pressure.',
     stats: '142 Solved (68 Medium) · Top 18%',
-  },
-  {
-    id: 'notion',
-    name: 'Notion',
-    category: 'productivity',
-    icon: 'FileText',
-    status: 'disconnected',
-    description: 'Pull lecture notes, project roadmaps, and personal journals.',
+    requiredInOnboarding: false,
   },
   {
     id: 'spotify',
@@ -145,6 +255,7 @@ export const INITIAL_SERVICES: ConnectedService[] = [
     lastSync: 'Yesterday',
     description: 'Syncs calm lofi beats and binaural soundscapes during focus sessions.',
     stats: 'Lo-fi Study Beats synced',
+    requiredInOnboarding: false,
   },
 ]
 

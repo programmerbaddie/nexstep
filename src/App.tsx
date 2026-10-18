@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { NexStepProvider, useNexStep } from './hooks/useNexStepContext'
 import { Navbar } from './components/layout/Navbar'
 import { Sidebar, NAV_ITEMS } from './components/layout/Sidebar'
+import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { ConnectServicesPage } from './pages/ConnectServicesPage'
 import { DailyCheckinPage } from './pages/DailyCheckinPage'
 import { HomeDashboardPage } from './pages/HomeDashboardPage'
+import { TodaysCompassPage } from './pages/TodaysCompassPage'
+import { ResetScreenPage } from './pages/ResetScreenPage'
 import { CalmModePage } from './pages/CalmModePage'
 import { MyNextStepPage } from './pages/MyNextStepPage'
 import { DiscoverPage } from './pages/DiscoverPage'
@@ -18,6 +21,12 @@ const PageRouter: React.FC = () => {
   const { currentPage } = useNexStep()
 
   switch (currentPage) {
+    case 'home-dashboard':
+      return <HomeDashboardPage />
+    case 'todays-compass':
+      return <TodaysCompassPage />
+    case 'reset-screen':
+      return <ResetScreenPage />
     case 'landing':
       return <LandingPage />
     case 'login':
@@ -26,8 +35,6 @@ const PageRouter: React.FC = () => {
       return <ConnectServicesPage />
     case 'daily-checkin':
       return <DailyCheckinPage />
-    case 'home-dashboard':
-      return <HomeDashboardPage />
     case 'calm-mode':
       return <CalmModePage />
     case 'my-next-step':
@@ -45,9 +52,14 @@ const PageRouter: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { currentPage, setCurrentPage } = useNexStep()
+  const { currentPage, setCurrentPage, isOnboardingCompleted } = useNexStep()
 
-  const isCalm = currentPage === 'calm-mode'
+  // First-time user onboarding view
+  if (!isOnboardingCompleted) {
+    return <OnboardingFlow />
+  }
+
+  const isCalm = currentPage === 'calm-mode' || currentPage === 'reset-screen'
 
   return (
     <div

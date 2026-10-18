@@ -12,6 +12,8 @@ import {
   CheckCircle,
   X,
   Footprints,
+  Wind,
+  RotateCcw,
 } from 'lucide-react'
 import { useNexStep } from '../../hooks/useNexStepContext'
 import type { PageId } from '../../hooks/useNexStepContext'
@@ -31,20 +33,22 @@ interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { id: 'landing', label: 'Landing Page', icon: Home, section: 'Welcome' },
-  { id: 'login', label: 'Login / Auth', icon: LogIn, section: 'Welcome' },
   { id: 'home-dashboard', label: 'Home Dashboard', icon: LayoutDashboard, section: 'Core Companion' },
+  { id: 'todays-compass', label: "Today's Compass", icon: Compass, badge: 'Adaptive', section: 'Core Companion' },
   { id: 'my-next-step', label: 'My Next Step', icon: Footprints, badge: 'AI', section: 'Core Companion' },
-  { id: 'daily-checkin', label: 'Daily Check-in', icon: CheckCircle, badge: 'Daily', section: 'Core Companion' },
+  { id: 'reset-screen', label: 'Reset Screen', icon: Wind, badge: 'Calm', section: 'Wellbeing' },
   { id: 'calm-mode', label: 'Calm Mode', icon: HeartHandshake, badge: 'Zen', section: 'Wellbeing' },
-  { id: 'discover', label: 'Discover', icon: Compass, section: 'Career & Growth' },
+  { id: 'daily-checkin', label: 'Daily Check-in (Full)', icon: CheckCircle, section: 'Core Companion' },
   { id: 'calendar', label: 'Calendar', icon: CalendarDays, section: 'Academic Planning' },
+  { id: 'discover', label: 'Discover', icon: Compass, section: 'Career & Growth' },
   { id: 'connect-services', label: 'Connect Services', icon: Radio, section: 'Integrations' },
   { id: 'profile', label: 'Profile', icon: User, section: 'Settings' },
+  { id: 'landing', label: 'Landing Page', icon: Home, section: 'Welcome' },
+  { id: 'login', label: 'Login / Auth', icon: LogIn, section: 'Welcome' },
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
-  const { currentPage, setCurrentPage } = useNexStep()
+  const { currentPage, setCurrentPage, user, currentCompanion, resetOnboarding } = useNexStep()
 
   const handleNav = (id: PageId) => {
     setCurrentPage(id)
@@ -83,6 +87,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             >
               <X className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Active Companion Card */}
+          <div className="p-3 rounded-2xl bg-white border border-[#B9E4C9] shadow-card flex items-center gap-3">
+            <div
+              className={`w-10 h-10 rounded-xl ${currentCompanion.avatarBg} border ${currentCompanion.avatarBorder} flex items-center justify-center text-xl shrink-0`}
+            >
+              {currentCompanion.emoji}
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-bold text-slate-800 truncate">
+                {user.companionCustomName || currentCompanion.name} {currentCompanion.emoji}
+              </div>
+              <p className="text-[10px] text-[#438D6C] font-semibold truncate">{currentCompanion.tagline}</p>
+            </div>
           </div>
 
           {/* Quick Demo Switcher Title */}
@@ -135,15 +154,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </nav>
         </div>
 
-        {/* Bottom Gentle Nudge */}
-        <div className="pt-4 border-t border-[#EAF7F0]">
-          <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#F2FAF6] to-[#E5F5EC] border border-[#CBEBDC]">
-            <p className="text-[11px] font-semibold text-[#2D5443] flex items-center gap-1.5 mb-1">
+        {/* Bottom Actions */}
+        <div className="pt-3 border-t border-[#EAF7F0] space-y-2">
+          <button
+            onClick={() => {
+              resetOnboarding()
+              onClose()
+            }}
+            className="w-full flex items-center justify-center gap-1.5 p-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-900 hover:bg-[#EAF7F0] transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-[#58A983]" />
+            <span>Replay Onboarding Flow</span>
+          </button>
+
+          <div className="p-3 rounded-2xl bg-gradient-to-br from-[#F2FAF6] to-[#E5F5EC] border border-[#CBEBDC]">
+            <p className="text-[11px] font-semibold text-[#2D5443] flex items-center gap-1.5 mb-0.5">
               <span className="w-2 h-2 rounded-full bg-[#7EC8A5]" />
-              Gentle Reminder
+              Gentle Companion Rule
             </p>
             <p className="text-[11px] text-slate-600 leading-relaxed">
-              Progress in tech is a marathon, not a sprint. Step away when you feel blocked.
+              Progress in tech is a marathon. Breathe, commit, and step away when stuck.
             </p>
           </div>
         </div>

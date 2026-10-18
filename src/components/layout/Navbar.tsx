@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Menu,
   ChevronDown,
+  RotateCcw,
 } from 'lucide-react'
 import { useNexStep } from '../../hooks/useNexStepContext'
 import { Button } from '../ui/Button'
@@ -16,9 +17,9 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
-  const { currentPage, setCurrentPage, user, todayCheckin } = useNexStep()
+  const { currentPage, setCurrentPage, user, currentCompanion, todayCheckin, resetOnboarding } = useNexStep()
 
-  const isCalm = currentPage === 'calm-mode'
+  const isCalm = currentPage === 'calm-mode' || currentPage === 'reset-screen'
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#F8FCF9]/90 backdrop-blur-md border-b border-[#E2EFE7] px-4 lg:px-8 py-3 transition-colors">
@@ -51,48 +52,52 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar }) => {
           </div>
         </div>
 
-        {/* Center: Quick Student Status Pill */}
+        {/* Center: Companion & Student Status Pill */}
         <div className="hidden md:flex items-center gap-2 bg-white/80 border border-[#D8ECE0] rounded-full px-3.5 py-1.5 shadow-card text-xs">
+          {/* Active Companion Pill */}
+          <div className="flex items-center gap-1.5 font-bold text-slate-800 pr-1">
+            <span className="text-sm">{currentCompanion.emoji}</span>
+            <span>{user.companionCustomName || currentCompanion.name}</span>
+          </div>
+
+          <span className="text-slate-300">|</span>
+
           <div className="flex items-center gap-1.5 font-medium text-slate-700">
             <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>{user.streakDays} Day Streak</span>
+            <span>{user.streakDays}d Streak</span>
           </div>
-          <span className="text-slate-300">|</span>
-          <div className="flex items-center gap-1.5 text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-[#7EC8A5] animate-pulse" />
-            <span>Focus Balance: Balanced</span>
-          </div>
+
           {todayCheckin && (
             <>
               <span className="text-slate-300">|</span>
-              <span className="flex items-center gap-1 text-emerald-700">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Checked In
+              <span className="flex items-center gap-1 text-emerald-700 font-semibold capitalize">
+                <CheckCircle2 className="w-3.5 h-3.5" /> {todayCheckin.feeling}
               </span>
             </>
           )}
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Reset Onboarding / Replay Onboarding Button (Great for Judges & Testing) */}
+          <button
+            onClick={resetOnboarding}
+            title="Replay First-Time Onboarding Experience"
+            className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-900 px-2.5 py-1.5 rounded-full hover:bg-[#EAF7F0] border border-transparent hover:border-[#D5EAE0] transition-colors"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Onboarding Demo</span>
+          </button>
+
           {/* Calm Mode Direct Button */}
           <Button
             variant={isCalm ? 'primary' : 'calm'}
             size="sm"
             onClick={() => setCurrentPage(isCalm ? 'home-dashboard' : 'calm-mode')}
             icon={<Wind className="w-4 h-4 text-[#2D5443]" />}
-            className="rounded-full shadow-sm"
+            className="rounded-full shadow-sm text-xs"
           >
             <span className="hidden sm:inline">{isCalm ? 'Exit Calm' : 'Calm Mode'}</span>
-          </Button>
-
-          {/* Quick Check-in CTA if not completed */}
-          <Button
-            variant="soft"
-            size="sm"
-            onClick={() => setCurrentPage('daily-checkin')}
-            className="hidden sm:inline-flex rounded-full text-xs font-semibold"
-          >
-            Check-in
           </Button>
 
           {/* Notification Indicator */}

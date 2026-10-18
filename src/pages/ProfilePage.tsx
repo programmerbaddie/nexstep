@@ -5,21 +5,24 @@ import {
   Award,
   Save,
   CheckCircle2,
+  RotateCcw,
 } from 'lucide-react'
 import { useNexStep } from '../hooks/useNexStepContext'
+import { COMPANIONS } from '../utils/dummyData'
 import { Card } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { Input } from '../components/ui/Input'
 
 export const ProfilePage: React.FC = () => {
-  const { user, updateUser } = useNexStep()
+  const { user, updateUser, currentCompanion, setCompanion, resetOnboarding } = useNexStep()
 
   const [name, setName] = useState(user.name)
   const [targetRole, setTargetRole] = useState(user.targetRole)
   const [major, setMajor] = useState(user.major)
   const [bio, setBio] = useState(user.bio)
   const [academicLoad, setAcademicLoad] = useState(user.academicLoad)
+  const [companionName, setCompanionName] = useState(user.companionCustomName || currentCompanion.name)
   const [isSaved, setIsSaved] = useState(false)
 
   const handleSave = (e: React.FormEvent) => {
@@ -30,6 +33,7 @@ export const ProfilePage: React.FC = () => {
       major,
       bio,
       academicLoad,
+      companionCustomName: companionName,
     })
     setIsSaved(true)
     setTimeout(() => setIsSaved(false), 3000)
@@ -56,6 +60,9 @@ export const ProfilePage: React.FC = () => {
                 <Flame className="w-3 h-3 text-amber-500 fill-amber-500" />
                 {user.streakDays} Day Streak
               </Badge>
+              <Badge variant="career" size="sm">
+                <span>Companion: {companionName} {currentCompanion.emoji}</span>
+              </Badge>
             </div>
 
             <p className="text-xs font-semibold text-[#438D6C]">{user.handle} • {user.email}</p>
@@ -78,11 +85,55 @@ export const ProfilePage: React.FC = () => {
       </Card>
 
       {/* Profile Edit Form */}
-      <form onSubmit={handleSave}>
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Companion Customization Section */}
+        <Card rounded="3xl" className="p-6 sm:p-8 space-y-6 bg-white border-[#E2EFE7]">
+          <div>
+            <h3 className="font-bold text-slate-900 text-lg">My AI Companion</h3>
+            <p className="text-xs text-slate-500">
+              Change your active companion archetype and custom name
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            {COMPANIONS.map((c) => {
+              const isSelected = user.chosenCompanion === c.id
+
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => {
+                    setCompanion(c.id, companionName)
+                  }}
+                  className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center text-center ${
+                    isSelected
+                      ? 'border-[#7EC8A5] bg-[#E4F5ED] text-[#24523C] ring-2 ring-[#7EC8A5]/40 shadow-xs'
+                      : 'border-[#E2EFE7] bg-white text-slate-700 hover:bg-[#F2FAF6]'
+                  }`}
+                >
+                  <span className="text-3xl mb-1.5">{c.emoji}</span>
+                  <span className="text-xs font-bold">{c.name}</span>
+                  <span className="text-[10px] opacity-75">{c.tagline}</span>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="max-w-xs">
+            <Input
+              label="Companion Nickname"
+              value={companionName}
+              onChange={(e) => setCompanionName(e.target.value)}
+              placeholder="e.g. Nova"
+            />
+          </div>
+        </Card>
+
+        {/* Academic Preferences */}
         <Card rounded="3xl" className="p-6 sm:p-8 space-y-6 bg-white border-[#E2EFE7]">
           <div className="flex items-center justify-between border-b border-[#EDF7F2] pb-4">
             <div>
-              <h3 className="font-bold text-slate-900 text-lg">Companion Preferences</h3>
+              <h3 className="font-bold text-slate-900 text-lg">Student Preferences</h3>
               <p className="text-xs text-slate-500">
                 Customize how NexStep balances your academic intensity and career pacing
               </p>
@@ -172,8 +223,19 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Save Button */}
-          <div className="pt-2 flex justify-end">
+          {/* Bottom Action Buttons */}
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#EDF7F2]">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={resetOnboarding}
+              icon={<RotateCcw className="w-3.5 h-3.5 text-[#58A983]" />}
+              className="rounded-2xl text-xs"
+            >
+              Reset & Replay Onboarding
+            </Button>
+
             <Button
               type="submit"
               variant="primary"

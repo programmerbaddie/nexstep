@@ -23,7 +23,7 @@ export const DailyCheckinPage: React.FC = () => {
   const [energy, setEnergy] = useState<number>(todayCheckin?.energy ?? 3)
   const [stress, setStress] = useState<number>(todayCheckin?.stress ?? 2)
   const [mood, setMood] = useState<'energized' | 'calm' | 'neutral' | 'overwhelmed' | 'tired'>(
-    todayCheckin?.mood ?? 'calm'
+    (todayCheckin?.mood as 'energized' | 'calm' | 'neutral' | 'overwhelmed' | 'tired') || 'calm'
   )
   const [topGoal, setTopGoal] = useState<string>(todayCheckin?.topGoal ?? 'Complete Raft Lab 2B')
   const [notes, setNotes] = useState<string>(
